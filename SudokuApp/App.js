@@ -314,17 +314,32 @@
 
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, Button } from "react-native";
-
-import * as ImagePicker from "expo-image-picker";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import UploadImage from "./screens/UploadImage";
 import ProbaDruga from "./screens/ProbaDruga";
 import Proba from "./screens/Proba";
+import SudokuGame from "./screens/SudokuGame";
+
+const Stack = createNativeStackNavigator();
 
 function App() {
-  // return <UploadImage />;
-  // return <ProbaDruga />;
-  return <Proba />;
+  return (
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: "#87a690",
+          },
+          headerTintColor: "#ebecda",
+        }}
+      >
+        <Stack.Screen name="Proba" component={Proba} />
+        <Stack.Screen name="SudokuGame" component={SudokuGame} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({

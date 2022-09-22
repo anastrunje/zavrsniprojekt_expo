@@ -1,17 +1,23 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Image, Button } from "react-native";
-
-import Constants from "expo-constants";
-const { manifest } = Constants;
+import { View, Text, StyleSheet, Button } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import * as ImagePicker from "expo-image-picker";
 import * as FS from "expo-file-system";
-import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 
 function Proba() {
   //The path of the picked image
   const [imageUri, setImageUri] = useState(null);
   const [status, setStatus] = useState(null);
+  // const [sudokuDigits, setSudokuDigits] = useState([]);
+
+  var sudokuDigits = [];
+
+  const navigation = useNavigation();
+  const goToGame = () => {
+    navigation.navigate("SudokuGame", { sudokuDigits });
+  };
 
   toServer = async (mediaFile) => {
     let type = mediaFile.type;
@@ -22,29 +28,48 @@ function Proba() {
     let url = "";
     let content_type = "image/jpeg";
 
-    // type === "image"
-    //   ? ((route = "/image"), (content_type="image/jpeg"))
-    //   : ((route = "/video"))
-
     url = schema + host + ":" + port + route;
 
-    // const api =
-    //   typeof manifest.packagerOpts === `object` && manifest.packagerOpts.dev
-    //     ? manifest.debuggerHost.split(`:`).shift().concat(`:5000`)
-    //     : `api.example.com`;
+    // let response = await FS.uploadAsync(url, mediaFile.uri, {
+    //   headers: {
+    //     "content-type": content_type,
+    //   },
+    //   httpMethod: "GET",
+    //   uploadType: FS.FileSystemUploadType.BINARY_CONTENT,
+    // });
 
-    // url = `http://${manifest.debuggerHost.split(":").shift()}:5000`;
-
-    let response = await FS.uploadAsync(url, mediaFile.uri, {
+    const response = await fetch(url, {
+      method: "POST",
       headers: {
         "content-type": content_type,
       },
-      httpMethod: "POST",
-      uploadType: FS.FileSystemUploadType.BINARY_CONTENT,
-    });
+      body: mediaFile,
+    }).then((response) =>
+      response.json().then((data) => {
+        console.log("Data: ");
+        console.log(data);
+        // setSudokuDigits(data);
+        sudokuDigits = data;
+        console.log("Sudoku digits: ");
+        console.log(sudokuDigits);
+      })
+    );
 
-    console.log(response.headers);
-    console.log(response.body);
+    // console.log(response.headers);
+    // console.log(response.body);
+
+    // console.log(response);
+
+    // setSudokuDigits(response);
+
+    // axios
+    //   .get(url)
+    //   .then((response) => setSudokuDigits(response.data))
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    // console.log(sudokuDigits);
   };
 
   //This function is triggered when the Select an Image button is pressed
@@ -126,12 +151,16 @@ function Proba() {
         <Button onPress={openCamera} title="Open Camera" color={"#87a690"} />
       </View>
 
-      <View style={styles.imageContainer}>
+      {/* <View style={styles.imageContainer}>
         {imageUri !== "" && (
           <Image source={{ uri: imageUri }} style={styles.image} />
         )}
       </View>
-      <>{status && <Text style={styles.text}>{status}</Text>}</>
+      <>{status && <Text style={styles.text}>{status}</Text>}</> */}
+
+      <View style={styles.startGame}>
+        <Button onPress={goToGame} title="Start Game" />
+      </View>
     </View>
   );
 }
@@ -165,6 +194,9 @@ const styles = StyleSheet.create({
   },
   text: {
     margin: 5,
+  },
+  startGame: {
+    marginBottom: 10,
   },
 });
 
